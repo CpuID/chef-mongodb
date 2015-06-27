@@ -45,22 +45,31 @@ when 'debian'
   end
 
 when 'rhel', 'fedora'
-  yum_repository 'mongodb' do
-    description 'mongodb RPM Repository'
-    baseurl "http://downloads-distro.mongodb.org/repo/redhat/os/#{node['kernel']['machine']  =~ /x86_64/ ? 'x86_64' : 'i686'}"
-    action :create
-    gpgcheck false
-    enabled true
-  end
-  
-  yum_repository 'mongodb-org-3.0' do
-      description 'MongoDB Repository'
-      baseurl "https://repo.mongodb.org/yum/redhat/6/mongodb-org/3.0/#{node['kernel']['machine']  =~ /x86_64/ ? 'x86_64' : 'i686'}"
+  if node['platform'] == 'amazon'
+    yum_repository 'mongodb-org-3.0' do
+        description 'MongoDB Repository'
+        baseurl "https://repo.mongodb.org/yum/amazon/2013.03/mongodb-org/3.0/#{node['kernel']['machine']  =~ /x86_64/ ? 'x86_64' : 'i686'}"
+        action :create
+        gpgcheck false
+        enabled true
+    end
+  else
+    yum_repository 'mongodb' do
+      description 'mongodb RPM Repository'
+      baseurl "http://downloads-distro.mongodb.org/repo/redhat/os/#{node['kernel']['machine']  =~ /x86_64/ ? 'x86_64' : 'i686'}"
       action :create
       gpgcheck false
       enabled true
+    end
+    
+    yum_repository 'mongodb-org-3.0' do
+        description 'MongoDB Repository'
+        baseurl "https://repo.mongodb.org/yum/redhat/6/mongodb-org/3.0/#{node['kernel']['machine']  =~ /x86_64/ ? 'x86_64' : 'i686'}"
+        action :create
+        gpgcheck false
+        enabled true
+    end
   end
-
 else
   # pssst build from source
   Chef::Log.warn("Adding the #{node['platform_family']} 10gen repository is not yet not supported by this cookbook")
